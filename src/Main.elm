@@ -1,6 +1,6 @@
 module Main exposing (..)
 
-import Html exposing (Html, text, div, h1, img, input, button)
+import Html exposing (Html, text, div, h1, img, input, button, ul, li)
 import Html.Attributes as Attr exposing (src, type_, value)
 import Html.Events exposing (onInput, onClick)
 import Random
@@ -13,6 +13,7 @@ type alias Model =
     { numberOfDices : Int
     , rollsOfDice : Int
     , dices : List Int
+    , histories : List (List Int)
     }
 
 
@@ -21,6 +22,7 @@ init =
     { numberOfDices = 1
     , rollsOfDice = 6
     , dices = []
+    , histories = []
     }
         ! []
 
@@ -53,7 +55,7 @@ update msg model =
             model ! [ castDices model ]
 
         UpdateDices l ->
-            { model | dices = l } ! []
+            { model | dices = l, histories = l :: model.histories } ! []
 
 
 castDices : Model -> Cmd Msg
@@ -77,6 +79,7 @@ view model =
     div []
         [ viewSetting model
         , viewDices model.dices
+        , viewHistories model.histories
         ]
 
 
@@ -106,7 +109,13 @@ viewSetting model =
 viewDices : List Int -> Html Msg
 viewDices l =
     div []
-        [ text <| toString l ]
+        [ text <| "出目 : " ++ toString l ]
+
+
+viewHistories : List (List Int) -> Html Msg
+viewHistories l =
+    ul [] <|
+        List.map (\dices -> li [] [ text <| toString dices ]) l
 
 
 updateNumber : (Int -> Msg) -> String -> Msg
